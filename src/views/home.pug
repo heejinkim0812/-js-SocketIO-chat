@@ -14,11 +14,15 @@ html(lang="en")
                 form
                     input(placeholder="room name", type="text", required)
                     button Enter Room
-            
+                h4 Open Rooms: 
+                ul
             div#room
                 h3
                 ul  
-                form
+                form#name
+                    input(placeholder="nickname", type="text", required)
+                    button Save
+                form#msg
                     input(placeholder="message", type="text", required)
                     button Send
 

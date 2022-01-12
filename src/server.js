@@ -1,6 +1,7 @@
 import http from "http";
 // import WebSocket from "ws";
-import SocketIO from "socket.io";
+import {Server} from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import express from "express"; // express로 view와 render 설정 
 
 const app = express();
@@ -15,29 +16,69 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 //http, websocket protocol 생성
 const httpServer = http.createServer(app);
-const WsServer = SocketIO(httpServer);
+const WsServer = new Server(httpServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+
+instrument(WsServer, {
+    auth: false,
+  });
+  
+
+function publicRooms(){ 
+    const {
+        sockets: {
+            adapter: {sids, rooms},
+        },
+    } = WsServer;  
+    //const sids = WsServer.sockets.adapter.sids;
+    //const rooms = WsServer.sockets.adapter.rooms;
+    const publicRooms = [];
+    rooms.forEach((_, key) => {
+        if(sids.get(key)===undefined){
+            publicRooms.push(key);
+        }
+    })
+    return publicRooms;
+}
+
+function countRoom(roomName){
+    return WsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
 
 WsServer.on("connection", (socket) => {
+    socket.nickname = "Anonymous";
     socket.onAny( (event) => {
+        console.log(WsServer.sockets.adapter);
         console.log(`Socket Event:${event}`)
     });
     socket.on("enter_room", (roomName, done)=>{
-        //console.log(socket.rooms); //socket.id
+        //console.log(socket.rooms); //sids, rooms 정보 : private room key = socket id
         socket.join(roomName);
         done();
-        socket.to(roomName).emit("welcome"); //본인을 제외하고 웰컴메세지
+        socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName)); //본인을 제외하고 웰컴메세지: A joined!
         /*
         setTimeout(()=>{
             done("hello from the backend");
         },1000) //front에서 function 실행됨(보안상 문제)
         */
+       WsServer.sockets.emit("room_change", publicRooms()); // 모든 socket한테 보냄
     });
     socket.on("disconnecting", ()=>{
-        socket.rooms.forEach( (room)=> socket.to(room).emit("bye") ); //본인을 제외하고 바이메세지
+        socket.rooms.forEach( (room)=> socket.to(room).emit("bye", socket.nickname, countRoom(room)-1) ); //본인을 제외하고 바이메세지: A left!        
+    })
+    socket.on("disconnect", ()=> {
+        WsServer.sockets.emit("room_change", publicRooms()); // 모든 socket한테 보냄
     })
     socket.on("new_message", (msg, room, done)=>{
-        socket.to(room).emit("new_message", msg);
+        socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
         done();
+    })
+    socket.on("nickname", (nickname)=> {
+        socket["nickname"]=nickname;
     })
 });
 
