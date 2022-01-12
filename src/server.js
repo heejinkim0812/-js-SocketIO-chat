@@ -1,7 +1,7 @@
 import http from "http";
-import WebSocket from "ws";
-import express from "express";
-// express로 view와 render 설정 
+// import WebSocket from "ws";
+import SocketIO from "socket.io";
+import express from "express"; // express로 view와 render 설정 
 
 const app = express();
 
@@ -14,9 +14,35 @@ app.get("/*", (req, res) => res.redirect("/")); //어떤 페이지로 GET reques
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 //http, websocket protocol 생성
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
+const WsServer = SocketIO(httpServer);
 
+WsServer.on("connection", (socket) => {
+    socket.onAny( (event) => {
+        console.log(`Socket Event:${event}`)
+    });
+    socket.on("enter_room", (roomName, done)=>{
+        //console.log(socket.rooms); //socket.id
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome"); //본인을 제외하고 웰컴메세지
+        /*
+        setTimeout(()=>{
+            done("hello from the backend");
+        },1000) //front에서 function 실행됨(보안상 문제)
+        */
+    });
+    socket.on("disconnecting", ()=>{
+        socket.rooms.forEach( (room)=> socket.to(room).emit("bye") ); //본인을 제외하고 바이메세지
+    })
+    socket.on("new_message", (msg, room, done)=>{
+        socket.to(room).emit("new_message", msg);
+        done();
+    })
+});
+
+/*
+const wss = new WebSocket.Server({ server });
 const sockets = [];
 
 //socket: 연결된 브라우저
@@ -46,6 +72,6 @@ wss.on("connection", (socket) => {
     }); 
 
     //socket.send("hello!!"); //socket한테 메세지 보냄
-});
-
-server.listen(3000, handleListen);
+}); 
+*/
+httpServer.listen(3000, handleListen);
