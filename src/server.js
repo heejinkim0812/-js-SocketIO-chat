@@ -1,8 +1,8 @@
+import express from "express"; // express로 view와 render 설정 
 import http from "http";
-// import WebSocket from "ws";
 import {Server} from "socket.io";
 import { instrument } from "@socket.io/admin-ui";
-import express from "express"; // express로 view와 render 설정 
+
 
 const app = express();
 
@@ -27,60 +27,86 @@ instrument(WsServer, {
     auth: false,
   });
   
+let publicRooms = [];
 
-function publicRooms(){ 
+function findPublicRooms(){ 
+    //const sids = WsServer.sockets.adapter.sids;
+    //const rooms = WsServer.sockets.adapter.rooms;
     const {
         sockets: {
             adapter: {sids, rooms},
         },
     } = WsServer;  
-    //const sids = WsServer.sockets.adapter.sids;
-    //const rooms = WsServer.sockets.adapter.rooms;
-    const publicRooms = [];
+    
+    publicRooms = [];
+    const roomsData = [];
+
     rooms.forEach((_, key) => {
-        if(sids.get(key)===undefined){
-            publicRooms.push(key);
+        if(sids.get(key)===undefined){ //private room 제외
+            roomsData.push(key);
         }
+    })
+
+    roomsData.forEach((room)=>{
+        const members = rooms.get(room);
+        const idData = [];
+        members.forEach((member)=>{
+            WsServer.sockets.sockets.forEach((socket)=>{
+                if(member === socket.id){
+                    idData.push({ id: member, nickname: socket.nickname});
+                }
+            })
+        })
+        publicRooms.push({ room, idData });
     })
     return publicRooms;
 }
 
+/*
 function countRoom(roomName){
-    return WsServer.sockets.adapter.rooms.get(roomName)?.size;
+    return WsServer.sockets.adapter.rooms.get(roomName)?.size; //멤버수
 }
+*/
 
 WsServer.on("connection", (socket) => {
-    socket.nickname = "Anonymous";
+
+    //WsServer.emit("room_change", findPublicRooms());
+    
     socket.onAny( (event) => {
-        console.log(WsServer.sockets.adapter);
         console.log(`Socket Event:${event}`)
     });
-    socket.on("enter_room", (roomName, done)=>{
-        //console.log(socket.rooms); //sids, rooms 정보 : private room key = socket id
+
+    socket.on("nickname", (nick, showRoomForm)=> {
+        socket.nickname = nick;
+        showRoomForm(nick);
+    })
+
+    socket.on("enter_room", (roomName, showMessageForm)=>{
+        //console.log(socket.rooms); //sids, rooms 정보: private room key = socket id
         socket.join(roomName);
-        done();
-        socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName)); //본인을 제외하고 웰컴메세지: A joined!
-        /*
-        setTimeout(()=>{
-            done("hello from the backend");
-        },1000) //front에서 function 실행됨(보안상 문제)
-        */
-       WsServer.sockets.emit("room_change", publicRooms()); // 모든 socket한테 보냄
+        showMessageForm();
+        socket.to(roomName).emit("welcome", socket.nickname); //본인을 제외하고 웰컴메세지: A joined!
+        WsServer.sockets.emit("room_change", findPublicRooms()); // 모든 socket한테 보냄
     });
-    socket.on("disconnecting", ()=>{
-        socket.rooms.forEach( (room)=> socket.to(room).emit("bye", socket.nickname, countRoom(room)-1) ); //본인을 제외하고 바이메세지: A left!        
-    })
-    socket.on("disconnect", ()=> {
-        WsServer.sockets.emit("room_change", publicRooms()); // 모든 socket한테 보냄
-    })
-    socket.on("new_message", (msg, room, done)=>{
-        socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
+
+    socket.on("new_message", (message, room, done)=>{
+        socket.to(room).emit("new_message", `${socket.nickname}: ${message}`);
         done();
     })
-    socket.on("nickname", (nickname)=> {
-        socket["nickname"]=nickname;
+
+    socket.on("disconnecting", ()=>{
+        socket.rooms.forEach( (room)=> {
+            socket.to(room).emit("bye", socket.nickname);
+        }); //본인을 제외하고 바이메세지: A left!        
+    })
+    
+    socket.on("disconnect", ()=> {
+        WsServer.sockets.emit("room_change", findPublicRooms()); // 모든 socket한테 보냄
     })
 });
+
+httpServer.listen(3000, handleListen);
+
 
 /*
 const wss = new WebSocket.Server({ server });
@@ -115,4 +141,3 @@ wss.on("connection", (socket) => {
     //socket.send("hello!!"); //socket한테 메세지 보냄
 }); 
 */
-httpServer.listen(3000, handleListen);

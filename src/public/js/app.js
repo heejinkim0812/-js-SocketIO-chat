@@ -1,81 +1,129 @@
 const socket = io(); //front-backend 연결
-const welcome = document.getElementById("welcome");
-const form = welcome.querySelector("form");
-const room = document.getElementById("room");
 
-room.hidden = true;
-let roomName;
+const h2 = document.querySelector('h2');
+const nicknameWrapper = document.querySelector('#nicknameWrapper');
+const nicknameForm = document.querySelector('#nicknameForm');
+const nicknameInput = document.querySelector('#nicknameInput');
+const roomWrapper = document.querySelector('#roomWrapper');
+const roomForm = document.querySelector('#roomForm');
+const roomInput = document.querySelector('#roomInput');
+const messageWrapper = document.querySelector('#messageWrapper');
+const messageForm = document.querySelector('#messageForm');
+const messageInput = document.querySelector('#messageInput');
+const messageUL = document.querySelector('#messageUL');
+const roomsUL = document.querySelector('#roomsUL');
+const welcomeText = document.createElement('p');
+const membersWrapper = document.querySelector('#membersWrapper');
+const membersText = document.querySelector('#membersText');
+const roomInfoWrapper = document.querySelector('#roomInfoWrapper');
 
-function handleMessageSubmit(event){
-    event.preventDefault();
-    const input = room.querySelector("#msg input");
-    const value = input.value;
-    socket.emit("new_message", input.value, roomName, ()=>{
-        addMessage(`YOU: ${value}`);
-    });
-    input.value="";
+let currentRoom = "";
+let nickname = "";
+
+const init = () =>{
+    membersWrapper.hidden = true; //숨기기
+    roomWrapper.hidden = true;    //숨기기
+    messageWrapper.hidden = true; //숨기기
+    nicknameInput.focus();
 }
+
+init();
+
+/* ============= CLIENT EVENT ============= */
 
 function handleNicknameSubmit(event){
     event.preventDefault();
-    const input = room.querySelector("#name input");
-    socket.emit("nickname", input.value);
-}
-
-function addMessage(message){
-    const ul = room.querySelector("ul");
-    const li = document.createElement("li");
-    li.innerText=message;
-    ul.appendChild(li);
-}
-
-function showRoom(){
-    welcome.hidden = true;
-    room.hidden = false;
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName}`;
-    const msgForm = room.querySelector("#msg");
-    const nameForm = room.querySelector("#name");
-    msgForm.addEventListener("submit", handleMessageSubmit);
-    nameForm.addEventListener("submit", handleNicknameSubmit);
+    socket.emit("nickname", nicknameInput.value, showRoomForm);
 }
 
 function handleRoomSubmit(event){
     event.preventDefault();
-    const input = form.querySelector("input");
-    socket.emit("enter_room", input.value, showRoom);
-    roomName = input.value;
-    input.value="";
+    socket.emit("enter_room", roomInput.value, showMessageForm);
+    currentRoom = roomInput.value;
+    roomInput.value="";
 }
 
-form.addEventListener("submit", handleRoomSubmit);
+function handleMessageSubmit(event){
+    event.preventDefault();
+    const message = messageInput.value;
+    socket.emit("new_message",  message, currentRoom, ()=>{
+        addMessage(`ME: ${message}`);
+    });
+    messageInput.value="";
+}
 
-socket.on("welcome", (user, newCount)=>{
+/* ============= Toggle Form ============= */
+
+function showRoomForm(newNickname){
+    nickname = newNickname;
+    //nickname 입력후 입장 → hidden설정
+    nicknameWrapper.hidden = true; //숨기기
+    roomWrapper.hidden = false;    //보이기
+    messageWrapper.hidden = true;  //숨기기
+    
+    roomInput.focus();
+    const p = document.createElement('p');
+    p.innerHTML = `Hello ${nickname}. Please Join a room.`;
+    roomWrapper.prepend(p);
+}
+
+function showMessageForm(){
+    //room 입력후 입장 → hidden설정
+    nicknameWrapper.hidden = true; //숨기기
+    roomWrapper.hidden = true;     //숨기기
+    messageWrapper.hidden = false; //보이기
+    membersWrapper.hidden = false; //보이기
+    h2.hidden = true;              //숨기기
+    roomInfoWrapper.hidden = true; //숨기기
+
+    messageInput.focus();
+    welcomeText.innerHTML  = `${nickname} in Room ${currentRoom} `;
+    membersWrapper.prepend(welcomeText);
+}
+
+/* ============= SOCKET EVENT ============= */
+
+function addMessage(message){
+    const li = document.createElement('li');
+    li.innerText = message;
+    messageUL.append(li);
+}
+
+socket.on("welcome", (user)=>{
     addMessage(`${user} joined!`);
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName} (${newCount})`;
 });
 
-socket.on("bye", (user, newCount)=>{
+socket.on("bye", (user)=>{
     addMessage(`${user} left!`);
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName} (${newCount})`;
 })
 
 socket.on("new_message", addMessage);
 
 socket.on("room_change", (rooms)=>{
-    const roomList = welcome.querySelector("ul");
-    roomList.innerText= "";
-    if(rooms.length === 0){
-        return;
-    }
-    rooms.forEach(room=>{
+    const roomsLength = document.querySelector('#roomsLength');
+    roomsLength.innerHTML  = ` (${rooms.length})`;
+    roomsUL.innerHTML = '';
+    const roomMembers = [];
+    rooms.forEach( (room) => {
         const li = document.createElement("li");
-        li.innerText = room;
-        roomList.append(li);
+        li.innerHTML  = `${room.room} → ${room.idData.length} users`;
+        roomsUL.append(li);
+        if(room.room === currentRoom){
+            room.idData.forEach( (member) => {
+                roomMembers.push(member.nickname);
+            })
+        }
     })
+    const membersNumb = roomMembers.length;
+    const membersLength = document.querySelector('#membersLength');
+    membersLength.innerHTML  = ` (${membersNumb})`;
+    membersText.innerHTML  = roomMembers.toString();
 });
+
+
+nicknameForm.addEventListener('submit', handleNicknameSubmit);
+roomForm.addEventListener('submit', handleRoomSubmit);
+messageForm.addEventListener('submit', handleMessageSubmit);
 
 
 /*
