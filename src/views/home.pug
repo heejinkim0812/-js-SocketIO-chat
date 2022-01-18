@@ -5,11 +5,12 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Socket IO
-        link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+        //link(rel="stylesheet", href="https://unpkg.com/mvp.css")
         link(rel="stylesheet", href="/public/css/style.css")
+        link(href='https://fonts.googleapis.com/css?family=Monoton' rel='stylesheet')
     body 
         header 
-            h2 SocketIO Chat
+            h1 SocketIO Chat
         main   
             div#membersWrapper
                 h5 Members 
@@ -19,25 +20,25 @@ html(lang="en")
             div#roomInfoWrapper
                 h5 Open Rooms
                     span#roomsLength  
-                p#noroom
                 ul#roomsUL
 
             div#nicknameWrapper  
                 form#nicknameForm
-                    input(id="nicknameInput", placeholder="nickname", type="text", required)
-                    button Save
+                    input(id="nicknameInput", placeholder=" Write your nickname", type="text", required)                    
+                    button#nicknameBtn Save
 
             div#roomWrapper
                 form#roomForm
-                    input(id="roomInput", placeholder="room name", type="text", required)
-                    button Enter Room
+                    input(id="roomInput", placeholder="  Room name", type="text", required)
+                    button#roomBtn Enter Room
 
-            ul#messageUL 
+            div#messageULWrapper
+                ul#messageUL 
 
             div#messageWrapper
                 form#messageForm
-                    input(id="messageInput", placeholder="message", type="text", required)
-                    button Send
+                    input(id="messageInput", placeholder="  Message", type="text", required)
+                    button#msgBtn Send
 
         script(src="/socket.io/socket.io.js") 
         script(src="/public/js/app.js") 

@@ -10,6 +10,7 @@ const roomInput = document.querySelector('#roomInput');
 const messageWrapper = document.querySelector('#messageWrapper');
 const messageForm = document.querySelector('#messageForm');
 const messageInput = document.querySelector('#messageInput');
+const messageULWrapper = document.querySelector('#messageULWrapper');
 const messageUL = document.querySelector('#messageUL');
 const roomsUL = document.querySelector('#roomsUL');
 const welcomeText = document.createElement('p');
@@ -24,6 +25,7 @@ const init = () =>{
     membersWrapper.hidden = true; //숨기기
     roomWrapper.hidden = true;    //숨기기
     messageWrapper.hidden = true; //숨기기
+    messageULWrapper.hidden = true;      //숨기기
     nicknameInput.focus();
 }
 
@@ -63,18 +65,20 @@ function showRoomForm(newNickname){
     
     roomInput.focus();
     const p = document.createElement('p');
-    p.innerHTML = `Hello ${nickname}. Please Join a room.`;
+    p.id="welcome";
+    p.innerHTML = `Hello ${nickname}! Please Join a room💍`;
     roomWrapper.prepend(p);
 }
 
 function showMessageForm(){
     //room 입력후 입장 → hidden설정
+    roomInfoWrapper.hidden = true; //숨기기
     nicknameWrapper.hidden = true; //숨기기
     roomWrapper.hidden = true;     //숨기기
     messageWrapper.hidden = false; //보이기
+    messageULWrapper.hidden = false;      //보이기
     membersWrapper.hidden = false; //보이기
-    h2.hidden = true;              //숨기기
-    roomInfoWrapper.hidden = true; //숨기기
+    h1.hidden = true;              //숨기기
 
     messageInput.focus();
     welcomeText.innerHTML  = `${nickname} in Room ${currentRoom} `;
@@ -104,20 +108,27 @@ socket.on("room_change", (rooms)=>{
     roomsLength.innerHTML  = ` (${rooms.length})`;
     roomsUL.innerHTML = '';
     const roomMembers = [];
-    rooms.forEach( (room) => {
+    
+    if(rooms.length===0){
         const li = document.createElement("li");
-        li.innerHTML  = `${room.room} → ${room.idData.length} users`;
+        li.innerHTML  = `No rooms now`;
         roomsUL.append(li);
-        if(room.room === currentRoom){
-            room.idData.forEach( (member) => {
-                roomMembers.push(member.nickname);
-            })
-        }
-    })
-    const membersNumb = roomMembers.length;
-    const membersLength = document.querySelector('#membersLength');
-    membersLength.innerHTML  = ` (${membersNumb})`;
-    membersText.innerHTML  = roomMembers.toString();
+    }else{
+        rooms.forEach( (room) => {
+            const li = document.createElement("li");
+            li.innerHTML  = `${room.room} → ${room.idData.length} users`;
+            roomsUL.append(li);
+            if(room.room === currentRoom){
+                room.idData.forEach( (member) => {
+                    roomMembers.push(member.nickname);
+                })
+            }
+        })
+        const membersNumb = roomMembers.length;
+        const membersLength = document.querySelector('#membersLength');
+        membersLength.innerHTML  = ` (${membersNumb})`;
+        membersText.innerHTML  = roomMembers.toString();
+    }  
 });
 
 

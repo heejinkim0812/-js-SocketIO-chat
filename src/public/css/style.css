@@ -1,0 +1,182 @@
+@import url("https://fonts.googleapis.com/css2?family=Luxurious+Roman&family=Neonderthaw&family=Noto+Serif+KR:wght@300&family=Pacifico&family=Ubuntu&display=swap");
+body {
+  font-family: ;
+  background-color: #222222;
+  background: repeating-linear-gradient(
+      45deg,
+      #2b2b2b 0%,
+      #2b2b2b 10%,
+      #222222 0%,
+      #222222 50%
+    )
+    0 / 15px 15px;
+  margin: 0 auto;
+  width: 500px;
+  padding: 150px 0px;
+  text-align: center;
+  color: #fff;
+}
+
+h1 {
+  font-size: 3.5em;
+  margin-bottom: 0;
+  margin-top: 0;
+  line-height: 1;
+  text-decoration: none;
+  color: #fff;
+  font-family: "Pacifico";
+  animation: neon 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ff1177,
+      0 0 70px #ff1177, 0 0 80px #ff1177, 0 0 100px #ff1177, 0 0 150px #ff1177;
+  }
+  to {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff1177,
+      0 0 35px #ff1177, 0 0 40px #ff1177, 0 0 50px #ff1177, 0 0 75px #ff1177;
+  }
+}
+
+#roomInfoWrapper {
+  width: 70%;
+  height: 200px;
+  background: rgba(130, 130, 130, 0.3);
+  margin: 50px auto;
+}
+
+#roomInfoWrapper h5 {
+  color: whitesmoke;
+  padding: 30px;
+  font-family: "Luxurious Roman", cursive;
+  font-size: 25px;
+}
+
+#roomInfoWrapper ul {
+  padding: 0px;
+  margin: -20px;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 17px;
+}
+
+#nicknameWrapper {
+  padding: 50px 0px;
+  position: relative;
+  left: 8px;
+}
+
+#nicknameInput,
+#roomInput,
+#messageInput {
+  font-family: inherit;
+  width: 50%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #fff;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+
+#nicknameBtn,
+#roomBtn,
+#msgBtn {
+  border-radius: 30px;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  background-color: #ce7bb0;
+  color: #fff;
+  padding: 12px 25px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  right: -10px;
+  bottom: 30px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: -5px 6px 20px 0px rgba(51, 51, 51, 0.4);
+}
+#nicknameBtn:hover {
+  background-color: #a267ac;
+}
+
+li {
+  list-style: none;
+}
+
+#welcome {
+  text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #6867ac 0%,
+    #a267ac 29%,
+    #ce7bb0 67%,
+    #ffbcd1 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+  font-size: 25px;
+}
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}
+
+#roomWrapper {
+  padding: 10px 0px;
+  position: relative;
+  left: 10px;
+}
+
+#membersWrapper {
+  padding: 5px 0px;
+}
+
+h5,
+#membersLength {
+  font-family: "Pacifico", cursive;
+  font-size: 20px;
+}
+
+#membersText {
+  position: relative;
+  top: -30px;
+  font-family: "Noto Serif KR", serif;
+  font-size: 15px;
+}
+
+#messageWrapper {
+  padding: 0px 0px;
+  position: relative;
+  left: 10px;
+  top: -10px;
+}
+
+#messageULWrapper {
+  position: relative;
+  top: -40px;
+  right: 42px;
+  width: 120%;
+  height: 400px;
+  background: rgba(130, 130, 130, 0.3);
+  margin: 50px auto;
+}
+
+#messageUL {
+  padding: 10px;
+  margin: -20px;
+  font-family: "Noto Serif KR", serif;
+}

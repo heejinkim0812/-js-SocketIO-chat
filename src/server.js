@@ -70,7 +70,7 @@ function countRoom(roomName){
 
 WsServer.on("connection", (socket) => {
 
-    //WsServer.emit("room_change", findPublicRooms());
+    WsServer.emit("room_change", findPublicRooms());
     
     socket.onAny( (event) => {
         console.log(`Socket Event:${event}`)
