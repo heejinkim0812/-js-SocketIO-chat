@@ -100,7 +100,9 @@ h1 {
   transition: all 0.25s ease;
   box-shadow: -5px 6px 20px 0px rgba(51, 51, 51, 0.4);
 }
-#nicknameBtn:hover {
+#nicknameBtn:hover,
+#roomBtn:hover,
+#msgBtn:hover {
   background-color: #a267ac;
 }
 
@@ -128,6 +130,7 @@ li {
   animation: textclip 2s linear infinite;
   display: inline-block;
   font-size: 25px;
+  font-weight: bold;
 }
 @keyframes textclip {
   to {
@@ -162,21 +165,23 @@ h5,
   padding: 0px 0px;
   position: relative;
   left: 10px;
-  top: -10px;
+  top: -50px;
 }
 
 #messageULWrapper {
   position: relative;
-  top: -40px;
+  top: -60px;
   right: 42px;
   width: 120%;
   height: 400px;
   background: rgba(130, 130, 130, 0.3);
   margin: 50px auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #messageUL {
-  padding: 10px;
+  padding: 30px;
   margin: -20px;
   font-family: "Noto Serif KR", serif;
 }

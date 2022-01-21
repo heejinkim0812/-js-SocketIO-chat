@@ -66,19 +66,19 @@ function showRoomForm(newNickname){
     roomInput.focus();
     const p = document.createElement('p');
     p.id="welcome";
-    p.innerHTML = `Hello ${nickname}! Please Join a room💍`;
+    p.innerHTML = `Hello "${nickname}"! Please Join a room💍`;
     roomWrapper.prepend(p);
 }
 
 function showMessageForm(){
     //room 입력후 입장 → hidden설정
-    roomInfoWrapper.hidden = true; //숨기기
-    nicknameWrapper.hidden = true; //숨기기
-    roomWrapper.hidden = true;     //숨기기
-    messageWrapper.hidden = false; //보이기
-    messageULWrapper.hidden = false;      //보이기
-    membersWrapper.hidden = false; //보이기
-    h1.hidden = true;              //숨기기
+    roomInfoWrapper.hidden = true;   //숨기기
+    nicknameWrapper.hidden = true;   //숨기기
+    roomWrapper.hidden = true;       //숨기기
+    messageWrapper.hidden = false;   //보이기
+    messageULWrapper.hidden = false; //보이기
+    membersWrapper.hidden = false;   //보이기
+    h1.hidden = true;                //숨기기
 
     messageInput.focus();
     welcomeText.innerHTML  = `${nickname} in Room ${currentRoom} `;

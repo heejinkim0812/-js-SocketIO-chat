@@ -105,7 +105,12 @@ WsServer.on("connection", (socket) => {
     })
 });
 
-httpServer.listen(3000, handleListen);
+//httpServer.listen(3000, handleListen);
+let port = process.env.PORT || 8080;
+httpServer.listen(port, () => {
+    console.log(`Server is listening on PORT 8080`);
+  });
+  
 
 
 /*
