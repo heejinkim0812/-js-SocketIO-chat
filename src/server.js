@@ -12,7 +12,6 @@ app.use("/public", express.static(__dirname + "/public")); //public url 생성�
  
 app.get("/", (req, res) => res.render("home")); //route handler로 home.pug render해줌
 app.get("/*", (req, res) => res.redirect("/")); //어떤 페이지로 GET request 보내도 redirect로 반응
-const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 //http, websocket protocol 생성
 const httpServer = http.createServer(app);
